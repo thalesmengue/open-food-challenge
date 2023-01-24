@@ -1,66 +1,107 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# PHP Challenge
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## A aplicação
 
-## About Laravel
+A aplicação consiste em um sistema que consume a API do Open Food Facts e salva no máximo 100 dados de cada
+arquivo do Open Food Facts(um banco de dados aberto com informação nutricional de diversos produtos alimentícios).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Fluxo de pensamento para a construção da aplicação
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1) Jobs 
+<br>
+a) criação de um job para baixar os 9 arquivos do Open Food Facts e salvar no storage da aplicação; <br>
+b) um job para pegar cada arquivo, abra ele, e consuma no máximo 100 objetos desse arquivo para evitar
+o uso de memória exagerado; <br>
+c) um job para salvar cada objeto que foi consumido dos arquivos no banco de dados, até o máximo de 100 objetos de cada arquivo; <br>
+d) um job que vai ser garantir que o job intermediário (o que pega 100 objetos de cada arquivo) vai ser chamado uma vez para cada arquivo. <br>
 
-## Learning Laravel
+2) Controllers <br>
+a) para abstrair a regra de manipulação do banco de dados do controller, foram criados repositórios; <br>
+b) nos repositórios foram criadas as funções que vão ser usadas para manipular o banco de dados(index, update, delete); <br>
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+3) Migrations <br>
+a) a maioria dos dados foram criados como nullable, pois nem todos os dados do Open Food Facts vem preenchidos; <br>
+b) foi criado um campo para armazenar o código do produto, pois o código do produto é único; <br>
+c) alguns campos foram criados como text, pois campos como o ```url```, ```categories``` e ```ingredients_text``` tem um tamanho
+que excede o limite de strings do tipo string do banco de dados; <br>
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+4) Observer <br>
+a) para abstrair do job que salva os dados no banco de dados a responsabilidade de preencher o campo ```imported_t```
+que é a data que o dado foi importado, foi criado um observer que vai ser chamado toda vez que um dado for salvo no banco de dados,
+e vai preencher o campo ```imported_t``` com a data atual da importação. <br>
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Rotas
 
-## Laravel Sponsors
+### Database
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+| Método HTTP | Endpoint | Descrição                                                                                                                                            |
+|-------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| GET         | `/api/`  | Retorna o status da conexão, leitura e escritura com a base de dados, horário da última vez que o CRON foi executado, tempo online e uso de memória. |
 
-### Premium Partners
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+### Products
 
-## Contributing
+| Método HTTP | Endpoint               | Descrição                                                    |
+|-------------|------------------------|--------------------------------------------------------------|
+| GET         | `/api/products`        | Retorna todos os produtos cadastrados no banco de dados      |
+| GET         | `/api/products/{code}` | Retorna os dados de determinado produto                      |
+| PUT         | `/api/products/{code}` | Atualiza os dados de determinado produto                     |
+| DELETE      | `/api/products/{code}` | Deleta determinado produto e atualiza seu status para 'trash' |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+O ```{code}``` é referente ao código unico de cada produto cadastrado.
 
-## Code of Conduct
+## Como rodar o projeto
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+siga os passos abaixo
 
-## Security Vulnerabilities
+```
+# clone o projeto
+$ git clone git@github.com:thalesmengue/open-food-challenge.git
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# entre na pasta do projeto e instale as dependências
+$ composer install
 
-## License
+# copie o arquivo .env.example para .env
+$ cp .env.example .env
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# sete as variáveis de ambiente do banco de dados, e também troque o método de processamento
+da fila para algum de sua preferência, eu gosto de utilizar o redis, mas caso prefira você pode utilizar o seu banco de dados
+
+$ DB_DATABASE={nome_do_banco}
+$ DB_USERNAME={usuario_do_banco}
+$ DB_PASSWORD={senha_do_banco}
+$ QUEUE_CONNECTION={driver_da_fila}
+
+# gere a chave da aplicação
+$ php artisan key:generate
+
+# rode as migrations
+$ php artisan migrate
+
+# os cron jobs foram específicados para rodar todo dia 00:00, assim que chegar esse horário, só
+rodar o comando abaixo
+$ php artisan schedule:run
+
+# ao rodar o comando acima, a aplicação irá jogar para a fila os jobs para baixar os arquivos, processar e importar os dados
+assim, é necessário rodar a fila
+$ php artisan queue:work
+
+# rode a aplicação
+$ php artisan serve
+```
+
+## Como rodar os testes
+Os testes da aplicação foram feitos com o PHPUnit, para rodar os testes, basta rodar o comando abaixo, mas é recomendado
+rodar os testes, apenas após os Cron Jobs serem rodados, pois, alguns dos testes usam o assert com base nos dados persistidos
+no banco de dados.
+
+```
+php artisan test
+```
+
+## Referências
+
+- [Open Food Facts](https://world.openfoodfacts.org/)
+- [Laravel](https://laravel.com/)
+- [PHP](https://www.php.net/)
