@@ -17,7 +17,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-         $schedule->job(GetProductJsonFile::class)->dailyAt('15:02');
+         $schedule->job(GetProductJsonFile::class)->dailyAt('00:00');
     }
 
     /**
