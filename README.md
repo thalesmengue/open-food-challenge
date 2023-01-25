@@ -17,7 +17,6 @@ d) um job que vai ser garantir que o job intermediário (o que pega 100 objetos 
 
 2) Controllers <br>
 a) para abstrair a regra de manipulação do banco de dados do controller, foram criados repositórios, para as funções 'index, show, update e delete'; <br>
-b) nos repositórios foram criadas as funções que vão ser usadas para manipular o banco de dados(index, update, delete); <br>
 
 3) Migrations <br>
 a) a maioria dos dados foram criados como nullable, pois nem todos os dados do Open Food Facts vem preenchidos; <br>
