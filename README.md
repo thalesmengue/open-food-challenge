@@ -35,9 +35,9 @@ e vai preencher o campo ```imported_t``` com a data atual da importação. <br>
 
 ### Database
 
-| Método HTTP | Endpoint | Descrição                                                                                                                                            |
-|-------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------|
-| GET         | `/api/`  | Retorna o status da conexão, leitura e escritura com a base de dados, horário da última vez que o CRON foi executado, tempo online e uso de memória. |
+| Método HTTP | Endpoint | Descrição                                                                                                              |
+|-------------|----------|------------------------------------------------------------------------------------------------------------------------|
+| GET         | `/api/`  | Retorna o status da conexão, leitura e escritura com a base de dados e horário da última vez que o CRON foi executado. |
 
 
 ### Products
