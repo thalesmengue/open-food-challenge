@@ -3,6 +3,7 @@
 namespace Tests\Feature\Controller;
 
 use App\Models\Product;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Symfony\Component\HttpFoundation\Response;
@@ -10,54 +11,59 @@ use Tests\TestCase;
 
 class ProductControllerTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_should_retrieve_all_products(): void
     {
         $response = $this->get('/api/products');
 
-        $data = Product::query()->paginate(10);
-
-        $data = json_decode($data);
-
-        $response->assertJsonFragment([$data]);
+        $response->assertSee('Next');
+        $response->assertOk()
+            ->assertStatus(Response::HTTP_OK);
     }
 
     public function test_should_retrieve_a_unique_product(): void
     {
-        $code = '"0000000000017';
-        $response = $this->get('/api/products/' . $code);
+        $product = Product::factory()->create();
+
+        $response = $this->get('/api/products/' . $product->code);
 
         $response->assertStatus(Response::HTTP_FOUND);
         $response->assertJsonFragment([
-            'code' => $code
+            'code' => $product->code,
+            'product_name' => $product->product_name,
+            'url' => $product->url,
         ]);
     }
 
     public function test_should_update_a_registered_product(): void
     {
-        $code = '"000000000054';
-        $response = $this->put('/api/products/' . $code, [
-            'code' => $code,
-            'product_name' => 'Teste',
+        $product = Product::factory()->create();
+
+        $response = $this->put('/api/products/' . $product->code, [
+            'product_name' => 'teste',
             'url' => 'https://www.teste.com.br'
         ]);
 
-        $response->assertStatus(Response::HTTP_OK);
-        $response->assertOk();
+        $response->assertOk()
+            ->assertStatus(Response::HTTP_OK);
         $this->assertDatabaseHas('products', [
-            'code' => $code,
-            'product_name' => 'Teste',
+            'code' => $product->code,
+            'product_name' => 'teste',
             'url' => 'https://www.teste.com.br'
         ]);
     }
 
     public function test_should_delete_a_registered_product(): void
     {
-        $code = '"0000000000031';
-        $response = $this->delete('/api/products/' . $code);
+        $product = Product::factory()->create();
 
-        $response->assertStatus(Response::HTTP_NO_CONTENT);
+        $response = $this->delete('/api/products/' . $product->code);
+
+        $response->assertNoContent()
+            ->assertStatus(Response::HTTP_NO_CONTENT);
         $this->assertDatabaseHas('products', [
-            'code' => $code,
+            'code' => $product->code,
             'status' => 'trash'
         ]);
     }

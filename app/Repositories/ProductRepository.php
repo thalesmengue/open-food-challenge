@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Enums\ProductStatus;
 use App\Models\Product;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -33,6 +34,6 @@ class ProductRepository implements ProductRepositoryInterface
     {
         return Product::query()
             ->where('code', $code)
-            ->update(['status' => 'trash']);
+            ->update(['status' => ProductStatus::trash->value]);
     }
 }

@@ -10,11 +10,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends Controller
 {
-    public ProductRepository $productRepository;
-
-    public function __construct()
+    public function __construct(
+        private readonly ProductRepository $productRepository
+    )
     {
-        $this->productRepository = new ProductRepository();
     }
 
     public function index(): JsonResponse
@@ -51,9 +50,6 @@ class ProductController extends Controller
     {
         $product = $this->productRepository->delete($code);
 
-        return response()->json([
-            'success' => true,
-            'data' => $product
-        ], Response::HTTP_NO_CONTENT);
+        return response()->json([], Response::HTTP_NO_CONTENT);
     }
 }

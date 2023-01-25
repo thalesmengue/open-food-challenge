@@ -15,10 +15,9 @@ class Kernel extends ConsoleKernel
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
      */
-    protected function schedule(Schedule $schedule): void
+    protected function schedule(Schedule $schedule)
     {
-         $schedule->job(GetProductJsonFile::class)->everyMinute();
-         $schedule->job(ProcessAllJsonFiles::class)->everyMinute();
+         $schedule->job(GetProductJsonFile::class)->dailyAt('15:02');
     }
 
     /**

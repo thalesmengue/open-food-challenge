@@ -17,7 +17,7 @@ c) um job para salvar cada objeto que foi consumido dos arquivos no banco de dad
 d) um job que vai ser garantir que o job intermediário (o que pega 100 objetos de cada arquivo) vai ser chamado uma vez para cada arquivo. <br>
 
 2) Controllers <br>
-a) para abstrair a regra de manipulação do banco de dados do controller, foram criados repositórios; <br>
+a) para abstrair a regra de manipulação do banco de dados do controller, foram criados repositórios, para as funções 'index, show, update e delete'; <br>
 b) nos repositórios foram criadas as funções que vão ser usadas para manipular o banco de dados(index, update, delete); <br>
 
 3) Migrations <br>
@@ -42,11 +42,11 @@ e vai preencher o campo ```imported_t``` com a data atual da importação. <br>
 
 ### Products
 
-| Método HTTP | Endpoint               | Descrição                                                    |
-|-------------|------------------------|--------------------------------------------------------------|
-| GET         | `/api/products`        | Retorna todos os produtos cadastrados no banco de dados      |
-| GET         | `/api/products/{code}` | Retorna os dados de determinado produto                      |
-| PUT         | `/api/products/{code}` | Atualiza os dados de determinado produto                     |
+| Método HTTP | Endpoint               | Descrição                                                     |
+|-------------|------------------------|---------------------------------------------------------------|
+| GET         | `/api/products`        | Retorna todos os produtos cadastrados no banco de dados       |
+| GET         | `/api/products/{code}` | Retorna os dados de determinado produto                       |
+| PUT         | `/api/products/{code}` | Atualiza os dados de determinado produto                      |
 | DELETE      | `/api/products/{code}` | Deleta determinado produto e atualiza seu status para 'trash' |
 
 O ```{code}``` é referente ao código unico de cada produto cadastrado.
@@ -79,12 +79,17 @@ $ php artisan key:generate
 # rode as migrations
 $ php artisan migrate
 
-# os cron jobs foram específicados para rodar todo dia 00:00, assim que chegar esse horário, só
-rodar o comando abaixo
-$ php artisan schedule:run
+# hora de configurar o cronjob para rodar, lembrando que o horário de execução do cronjob está setado para a 00:00,
+então, necessário rodar o comando abaixo na pasta raiz do projeto
+$ crontab -e
 
-# ao rodar o comando acima, a aplicação irá jogar para a fila os jobs para baixar os arquivos, processar e importar os dados
-assim, é necessário rodar a fila
+# ao rodar o comando acima, é preciso configurar a execução do cronjob, para isso, basta adicionar no arquivo aberto a linha abaixo
+adequada ao seu contexto, no meu caso foi o seguinte:
+$ 0 0 * * * cd /home/thalesmengue/code/php-20200916 && php artisan schedule:run >> /dev/null 2>&1
+no entanto, é necessário adequar ao seu caso, pois, o caminho para a raiz da aplicação pode ser diferente então:
+$ 0 0 * * * cd {caminho_para_a_pasta_do_projeto} && php artisan schedule:run >> /dev/null 2>&1
+
+# com o cronjob configurado, basta apenas rodar a fila de processamento, que quando o cronjob rodar, irá jogar o job para a fila de execução: 
 $ php artisan queue:work
 
 # rode a aplicação

@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Services;
 
 use App\Models\Product;
 use Exception;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
-class DatabaseRepository
+class DatabaseService
 {
     public function getConnection()
     {
@@ -26,5 +27,10 @@ class DatabaseRepository
         } catch (Exception $e) {
             die("Database has a problem.  Please check your configuration. error:" . $e->getMessage());
         }
+    }
+
+    public function getCronLastExecution()
+    {
+        return $lastTimeExecuted = DB::table('cron_date_info')->orderBy('id', 'desc')->first('last_execution');
     }
 }

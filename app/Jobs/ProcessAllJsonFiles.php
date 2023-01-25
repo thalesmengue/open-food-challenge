@@ -28,7 +28,7 @@ class ProcessAllJsonFiles implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $files = [
             'products_01.json.gz',

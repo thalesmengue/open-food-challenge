@@ -2,28 +2,32 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\DatabaseRepository;
+use App\Services\DatabaseService;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DatabaseController extends Controller
 {
-    public DatabaseRepository $databaseRepository;
-    public function __construct()
+    public function __construct(
+        private readonly DatabaseService $service
+    )
     {
-        $this->databaseRepository = new DatabaseRepository();
     }
-    public function getStatus()
+
+    public function getStatus(): JsonResponse|string
     {
         try {
-            $dbReadAndWrite = $this->databaseRepository->getConnection();
+            $dbReadAndWrite = $this->service->getConnection();
+            $lastTimeExecuted = $this->service->getCronLastExecution();
 
 
             return response()->json([
                 'success' => true,
                 'messages' => [
-                    'database_connection' => $dbReadAndWrite
+                    'databaseConnection' => $dbReadAndWrite,
+                    'lastTimeExecuted' => $lastTimeExecuted
                 ]
             ]);
         } catch (Exception $e) {
