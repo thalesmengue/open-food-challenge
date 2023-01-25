@@ -109,4 +109,4 @@ php artisan test
 
 - [Open Food Facts](https://world.openfoodfacts.org/)
 - [Laravel](https://laravel.com/)
-- [PHP](https://www.php.net/)
+- [PHP 8.1](https://www.php.net/)
