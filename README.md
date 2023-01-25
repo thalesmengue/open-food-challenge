@@ -8,8 +8,7 @@ arquivo do Open Food Facts(um banco de dados aberto com informação nutricional
 
 ## Fluxo de pensamento para a construção da aplicação
 
-1) Jobs 
-<br>
+1) Jobs<br>
 a) criação de um job para baixar os 9 arquivos do Open Food Facts e salvar no storage da aplicação; <br>
 b) um job para pegar cada arquivo, abra ele, e consuma no máximo 100 objetos desse arquivo para evitar
 o uso de memória exagerado; <br>
