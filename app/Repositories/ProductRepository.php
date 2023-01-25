@@ -13,6 +13,7 @@ class ProductRepository implements ProductRepositoryInterface
     public function all(): LengthAwarePaginator
     {
         return Product::query()
+            ->notTrashed()
             ->paginate(10);
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -36,4 +37,9 @@ class Product extends Model
         'main_category',
         'image_url',
     ];
+
+    public function scopeNotTrashed($query): Builder
+    {
+        return $query->where('status', '!=','trash');
+    }
 }
