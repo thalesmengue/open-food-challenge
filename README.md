@@ -29,6 +29,9 @@ a) para abstrair do job que salva os dados no banco de dados a responsabilidade 
 que é a data que o dado foi importado, foi criado um observer que vai ser chamado toda vez que um dado for salvo no banco de dados,
 e vai preencher o campo ```imported_t``` com a data atual da importação. <br>
 
+
+a parte de uso da memória relacionado ao Cron não foi inclusa, tendo em vista que a cada loop dos jobs, o
+uso de memória é limpo.
 ## Rotas
 
 ### Database

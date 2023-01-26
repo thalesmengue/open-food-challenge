@@ -23,7 +23,7 @@ class ProductController extends Controller
         return response()->json([
             'success' => true,
             'data' => $products
-        ]);
+        ], Response::HTTP_OK);
     }
 
     public function show(string $code): JsonResponse
@@ -43,7 +43,7 @@ class ProductController extends Controller
         return response()->json([
             'success' => true,
             'data' => $product
-        ]);
+        ], Response::HTTP_OK);
     }
 
     public function delete(string $code): JsonResponse
